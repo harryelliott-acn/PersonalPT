@@ -1,0 +1,61 @@
+import { v4 as uuidv4 } from "uuid"
+import type { Workout } from "../shared/schema"
+
+export const PRESETS: Workout[] = [
+  {
+    id: "preset-classic",
+    name: "7 Minute Workout",
+    isPreset: true,
+    rounds: 1,
+    colorAccent: "#FF7F11",
+    soundOption: "classic",
+    createdAt: new Date("2024-01-01"),
+    exercises: [
+      "Pressup",
+      "Crunch",
+      "Overhead Press",
+      "Leg Raise",
+      "Bicep Curl",
+      "Squat",
+      "Tricep Dip",
+      "Shoulder Raise",
+      "Lunge",
+      "Ab Rollout",
+      "Side Plank",
+    ].map((name) => ({ id: uuidv4(), name, durationSec: 30, restSec: 10 })),
+  },
+  {
+    id: "preset-core",
+    name: "Core Crusher",
+    isPreset: true,
+    rounds: 2,
+    colorAccent: "#3B82F6",
+    soundOption: "classic",
+    createdAt: new Date("2024-01-01"),
+    exercises: [
+      "Forearm Plank",
+      "Dead Bugs",
+      "Bicycle Crunch",
+      "Side Plank (Right)",
+      "Side Plank (Left)",
+      "Reverse Crunch",
+      "Mountain Climbers",
+      "Hollow Body Hold",
+    ].map((name) => ({ id: uuidv4(), name, durationSec: 40, restSec: 10 })),
+  },
+  {
+    id: "preset-stretch",
+    name: "Quick Stretch",
+    isPreset: true,
+    rounds: 1,
+    colorAccent: "#10B981",
+    soundOption: "classic",
+    createdAt: new Date("2024-01-01"),
+    exercises: [
+      { id: uuidv4(), name: "Neck Rolls", durationSec: 30, restSec: 5 },
+      { id: uuidv4(), name: "Shoulder Stretch", durationSec: 30, restSec: 5 },
+      { id: uuidv4(), name: "Hamstring Stretch", durationSec: 45, restSec: 10 },
+      { id: uuidv4(), name: "Quad Stretch", durationSec: 45, restSec: 10 },
+    ],
+  },
+]

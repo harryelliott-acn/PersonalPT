@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//private/etc/**)",
+      "Bash(echo $PATH)",
+      "Read(//usr/local/bin/**)",
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")",
+      "Bash(npm create:*)",
+      "Bash(npx tailwindcss:*)"
+    ]
+  }
+}
