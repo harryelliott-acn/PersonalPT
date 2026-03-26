@@ -80,7 +80,7 @@ export function EditWorkoutPage() {
   const totalMin = Math.round(totalSec / 60)
 
   return (
-    <div className="pb-24">
+    <div className="pb-36">
       <header className="flex items-center gap-2 px-4 pt-6 pb-4">
         <button onClick={() => navigate("/")} className="text-muted-foreground hover:text-foreground">
           <ChevronLeft size={24} />
@@ -193,7 +193,7 @@ export function EditWorkoutPage() {
       </div>
 
       {/* Actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex gap-3">
+      <div className="fixed bottom-16 left-0 right-0 bg-background border-t border-border px-4 py-3 flex gap-3">
         <button
           onClick={handleSave}
           className="flex-1 bg-muted text-foreground rounded-xl py-3 text-sm font-semibold"
