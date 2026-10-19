@@ -14,7 +14,7 @@ export default defineConfig({
         description: "Mobile-first interval workout timer",
         theme_color: "#FF7F11",
         background_color: "#ffffff",
-        display: "standalone",
+        display: "browser",
         orientation: "portrait",
         start_url: "/",
         icons: [

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useParams, useLocation } from "wouter"
-import { SkipForward, RotateCcw, Pause, Play } from "lucide-react"
+import { SkipForward, RotateCcw, Pause, Play, Square } from "lucide-react"
 import { getWorkout } from "../lib/db"
 import type { Workout } from "../shared/schema"
 import { useWorkoutRunner } from "../hooks/useWorkoutRunner"
@@ -45,6 +45,17 @@ function RunnerUI({ workout }: { workout: Workout }) {
   const elapsedMin = Math.floor(elapsedSec / 60)
   const elapsedSecRem = elapsedSec % 60
 
+  async function handleStop() {
+    const wasPaused = isPaused
+    pause()
+    if (!confirm("Stop this workout?")) {
+      if (!wasPaused) play()
+      return
+    }
+    if (state.stepsCompleted > 0) await finishAndSave()
+    navigate("/")
+  }
+
   async function handleFinish() {
     await finishAndSave()
     navigate("/")
@@ -76,6 +87,14 @@ function RunnerUI({ workout }: { workout: Workout }) {
       <GradientBackground />
       <div className={`absolute inset-0 ${phaseTint(state.phase)} transition-colors duration-300`} />
       <div className="relative h-full flex flex-col">
+        <button
+          onClick={handleStop}
+          className="absolute top-4 right-4 z-10 flex items-center gap-1.5 px-3 py-2 rounded-full bg-white/20 hover:bg-white/30 text-sm font-semibold transition-colors"
+          aria-label="Stop workout"
+        >
+          <Square size={14} fill="currentColor" />
+          Stop
+        </button>
 
       {/* Top info */}
       <div className="flex flex-col items-center pt-12 px-6 gap-1 landscape-hide">
