@@ -1,5 +1,5 @@
 import { useRoute, Link } from "wouter"
-import { Home, History, Settings } from "lucide-react"
+import { Home, Clock, Settings } from "lucide-react"
 
 export function BottomNav() {
   const [isRun] = useRoute("/run/:id")
@@ -12,7 +12,7 @@ export function BottomNav() {
     >
       <div className="pointer-events-auto bg-card border border-border rounded-full shadow-lg p-1.5 flex items-center gap-1">
         <NavItem href="/" icon={<Home size={22} />} label="Home" />
-        <NavItem href="/history" icon={<History size={22} />} label="History" />
+        <NavItem href="/history" icon={<Clock size={22} />} label="History" />
         <NavItem href="/settings" icon={<Settings size={22} />} label="Settings" />
       </div>
     </nav>
