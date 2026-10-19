@@ -81,7 +81,7 @@ function RunnerUI({ workout }: { workout: Workout }) {
       <div className="flex flex-col items-center pt-12 px-6 gap-1 landscape-hide">
         <PhaseLabel phase={state.phase} />
         {currentExercise && (
-          <p className="text-xl font-bold mt-1">{currentExercise.name}</p>
+          <p className="text-4xl font-bold mt-2 text-center leading-tight">{currentExercise.name}</p>
         )}
         <p className="text-sm opacity-60 mt-0.5">
           Round {state.currentRound}/{workout.rounds} · Exercise {state.currentExerciseIndex + 1}/{workout.exercises.length}
@@ -92,7 +92,7 @@ function RunnerUI({ workout }: { workout: Workout }) {
       <div className="hidden landscape-side-by-side flex-1 items-center px-8 gap-8">
         <div className="flex flex-col gap-1">
           <PhaseLabel phase={state.phase} />
-          {currentExercise && <p className="text-2xl font-bold">{currentExercise.name}</p>}
+          {currentExercise && <p className="text-4xl font-bold leading-tight">{currentExercise.name}</p>}
           <p className="text-sm opacity-60">
             Round {state.currentRound}/{workout.rounds} · {state.currentExerciseIndex + 1}/{workout.exercises.length}
           </p>

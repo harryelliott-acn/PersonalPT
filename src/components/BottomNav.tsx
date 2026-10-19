@@ -25,8 +25,8 @@ function NavItem({ href, icon, label }: { href: string; icon: React.ReactNode; l
     <Link
       href={href}
       aria-label={label}
-      className={`flex-1 flex items-center justify-center py-3.5 rounded-full transition-colors ${
-        active ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
+      className={`flex-1 flex items-center justify-center py-3.5 rounded-full transition-colors [&_svg]:fill-current ${
+        active ? "bg-muted text-foreground [&_svg]:stroke-muted" : "text-muted-foreground hover:text-foreground [&_svg]:stroke-card"
       }`}
     >
       {icon}
