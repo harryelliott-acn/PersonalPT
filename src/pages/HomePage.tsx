@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { Link } from "wouter"
-import { Plus } from "lucide-react"
 import { getAllWorkouts, deleteWorkout } from "../lib/db"
 import type { Workout } from "../shared/schema"
 import { StatsBar } from "../components/StatsBar"
@@ -35,9 +34,6 @@ export function HomePage() {
       <StatsBar />
 
       <section className="px-4 mt-4">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          Quick Start · Presets
-        </h2>
         <div className="flex flex-col gap-3">
           {presets.map((w) => (
             <WorkoutCard key={w.id} workout={w} onDelete={handleDelete} />
@@ -46,15 +42,9 @@ export function HomePage() {
       </section>
 
       <section className="px-4 mt-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-            Custom
-          </h2>
-          <Link href="/create">
-            <button className="flex items-center gap-1.5 text-sm font-medium text-primary">
-              <Plus size={16} />
-              Create
-            </button>
+        <div className="flex justify-center mb-3">
+          <Link href="/create" className="text-sm font-medium text-foreground underline">
+            create new one
           </Link>
         </div>
         {custom.length > 0 && (
