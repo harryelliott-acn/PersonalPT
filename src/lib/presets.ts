@@ -7,8 +7,8 @@ export const PRESETS: Workout[] = [
     name: "7 Minute Workout",
     isPreset: true,
     rounds: 1,
+    roundRestSec: 0,
     colorAccent: "#FF7F11",
-    soundOption: "classic",
     createdAt: new Date("2024-01-01"),
     exercises: [
       "Pressup",
@@ -29,8 +29,8 @@ export const PRESETS: Workout[] = [
     name: "Core Crusher",
     isPreset: true,
     rounds: 2,
+    roundRestSec: 0,
     colorAccent: "#3B82F6",
-    soundOption: "classic",
     createdAt: new Date("2024-01-01"),
     exercises: [
       "Forearm Plank",
@@ -48,8 +48,8 @@ export const PRESETS: Workout[] = [
     name: "Quick Stretch",
     isPreset: true,
     rounds: 1,
+    roundRestSec: 0,
     colorAccent: "#10B981",
-    soundOption: "classic",
     createdAt: new Date("2024-01-01"),
     exercises: [
       { id: uuidv4(), name: "Neck Rolls", durationSec: 30, restSec: 5 },

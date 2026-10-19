@@ -1,5 +1,3 @@
-import type { SoundOption } from "../shared/schema"
-
 type OscillatorType = "sine" | "square" | "sawtooth" | "triangle"
 
 interface AudioPlayer {
@@ -8,18 +6,6 @@ interface AudioPlayer {
   playStart: () => void
   playRest: () => void
   playFinish: () => Promise<void>
-}
-
-function getWaveform(theme: SoundOption): { primary: OscillatorType; secondary: OscillatorType } {
-  switch (theme) {
-    case "electronic":
-      return { primary: "sawtooth", secondary: "sawtooth" }
-    case "vibrant":
-      return { primary: "sine", secondary: "sine" }
-    case "classic":
-    default:
-      return { primary: "square", secondary: "sine" }
-  }
 }
 
 function playTone(
@@ -44,8 +30,9 @@ function playTone(
   osc.stop(startTime + duration)
 }
 
-export function createAudioPlayer(ctx: AudioContext, theme: SoundOption): AudioPlayer {
-  const { primary, secondary } = getWaveform(theme)
+export function createAudioPlayer(ctx: AudioContext): AudioPlayer {
+  const primary: OscillatorType = "square"
+  const secondary: OscillatorType = "sine"
 
   async function ensureResumed() {
     if (ctx.state === "suspended") {

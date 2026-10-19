@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react"
 import { getStats } from "../lib/db"
+import { useDataVersion } from "../lib/sync"
 import { Flame, Dumbbell } from "lucide-react"
 
 export function StatsBar() {
   const [stats, setStats] = useState({ streak: 0, totalCount: 0 })
+  const dataVersion = useDataVersion()
 
   useEffect(() => {
     getStats().then(setStats)
-  }, [])
+  }, [dataVersion])
 
   return (
     <div className="flex gap-4 px-4 py-3">

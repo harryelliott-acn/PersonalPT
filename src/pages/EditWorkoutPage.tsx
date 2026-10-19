@@ -114,19 +114,20 @@ export function EditWorkoutPage() {
           />
         </div>
 
-        {/* Audio */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Audio Theme</label>
-          <select
-            value={workout.soundOption}
-            onChange={(e) => updateField("soundOption", e.target.value as Workout["soundOption"])}
-            className="bg-card border border-border rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/50"
-          >
-            <option value="classic">Classic</option>
-            <option value="electronic">Electronic</option>
-            <option value="vibrant">Vibrant</option>
-          </select>
-        </div>
+        {/* Rest between rounds */}
+        {workout.rounds > 1 && (
+          <div>
+            <label className="block text-sm font-medium mb-1">Rest between rounds (sec)</label>
+            <input
+              type="number"
+              min={0}
+              value={workout.roundRestSec}
+              onChange={(e) => updateField("roundRestSec", Math.max(0, Math.floor(Number(e.target.value)) || 0))}
+              className="w-24 bg-card border border-border rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/50"
+            />
+            <p className="text-xs text-muted-foreground mt-1">Added after the last exercise's rest, before the next round starts.</p>
+          </div>
+        )}
 
         {/* Exercises */}
         <div>

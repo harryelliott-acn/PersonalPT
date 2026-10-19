@@ -27,7 +27,6 @@ export function WorkoutCard({ workout, onDelete }: WorkoutCardProps) {
   return (
     <div
       className="bg-card border border-border rounded-2xl p-4 flex flex-col gap-3"
-      style={workout.colorAccent ? { borderLeftColor: workout.colorAccent, borderLeftWidth: 3 } : undefined}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
@@ -73,10 +72,9 @@ export function WorkoutCard({ workout, onDelete }: WorkoutCardProps) {
 
       <Link href={`/run/${workout.id}`}>
         <button
-          className="w-full py-2.5 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2 transition-opacity active:opacity-80"
-          style={{ backgroundColor: "#FF5D12" }}
+          className="w-full py-2.5 rounded-xl font-semibold text-sm bg-foreground text-background flex items-center justify-center gap-2 transition-opacity active:opacity-80"
         >
-          <Play size={16} fill="white" />
+          <Play size={16} fill="currentColor" />
           Start
         </button>
       </Link>

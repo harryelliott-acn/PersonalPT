@@ -5,7 +5,7 @@ import { createAudioPlayer } from "../lib/audio"
 import { speakCongrats } from "../lib/voiceCongrats"
 import { saveRun } from "../lib/db"
 
-export type Phase = "ready" | "get_ready" | "work" | "rest" | "paused" | "finished"
+export type Phase = "ready" | "get_ready" | "work" | "rest" | "round_rest" | "paused" | "finished"
 
 interface RunnerState {
   phase: Phase
@@ -50,7 +50,7 @@ export function useWorkoutRunner(workout: Workout): WorkoutRunner {
       audioCtxRef.current = new AudioContext()
     }
     if (!playerRef.current) {
-      playerRef.current = createAudioPlayer(audioCtxRef.current, workout.soundOption)
+      playerRef.current = createAudioPlayer(audioCtxRef.current)
     }
     return playerRef.current
   }
@@ -96,6 +96,15 @@ export function useWorkoutRunner(workout: Workout): WorkoutRunner {
             secondsRemaining: nextEx.durationSec,
             stepsCompleted: s.stepsCompleted + 1,
           }
+        } else if (s.currentRound < workout.rounds && workout.roundRestSec > 0) {
+          // Extra pause between rounds
+          player.playRest()
+          return {
+            ...s,
+            phase: "round_rest",
+            secondsRemaining: workout.roundRestSec,
+            stepsCompleted: s.stepsCompleted + 1,
+          }
         } else if (s.currentRound < workout.rounds) {
           // Start next round
           player.playStart()
@@ -117,10 +126,20 @@ export function useWorkoutRunner(workout: Workout): WorkoutRunner {
         }
       }
 
+      case "round_rest": {
+        player.playStart()
+        return {
+          ...s,
+          phase: "work",
+          currentExerciseIndex: 0,
+          currentRound: s.currentRound + 1,
+          secondsRemaining: workout.exercises[0].durationSec,
+        }
+      }
+
       default:
         return s
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workout])
 
   function startTick() {
@@ -194,10 +213,12 @@ export function useWorkoutRunner(workout: Workout): WorkoutRunner {
       let duration = GET_READY_DURATION
       if (prev.phase === "work") duration = workout.exercises[prev.currentExerciseIndex].durationSec
       if (prev.phase === "rest") duration = workout.exercises[prev.currentExerciseIndex].restSec
+      if (prev.phase === "round_rest") duration = workout.roundRestSec
       if (prev.phase === "paused") {
         const pp = prev.prePhase
         if (pp === "work") duration = workout.exercises[prev.currentExerciseIndex].durationSec
         else if (pp === "rest") duration = workout.exercises[prev.currentExerciseIndex].restSec
+        else if (pp === "round_rest") duration = workout.roundRestSec
         startTick()
         return { ...prev, phase: pp ?? "work", prePhase: null, secondsRemaining: duration }
       }

@@ -5,6 +5,7 @@ import { getWorkout } from "../lib/db"
 import type { Workout } from "../shared/schema"
 import { useWorkoutRunner } from "../hooks/useWorkoutRunner"
 import { ProgressBar } from "../components/ProgressBar"
+import { GradientBackground } from "../components/GradientBackground"
 
 function PhaseLabel({ phase }: { phase: string }) {
   const labels: Record<string, string> = {
@@ -12,19 +13,22 @@ function PhaseLabel({ phase }: { phase: string }) {
     get_ready: "Get Ready",
     work: "Work",
     rest: "Rest",
+    round_rest: "Round Rest",
     paused: "Paused",
     finished: "Done!",
   }
   return <span className="text-lg font-semibold uppercase tracking-widest opacity-80">{labels[phase] ?? phase}</span>
 }
 
-function phaseBackground(phase: string): string {
+// Tint laid over the gradient so each phase still reads at a glance.
+function phaseTint(phase: string): string {
   switch (phase) {
-    case "work": return "bg-white text-gray-900"
-    case "rest": return "bg-black text-white"
-    case "paused": return "bg-gray-800 text-white"
-    case "finished": return "text-white"
-    default: return "bg-gray-900 text-white"
+    case "work":
+    case "finished": return "bg-transparent"
+    case "rest":
+    case "round_rest": return "bg-black/60"
+    case "paused": return "bg-black/70"
+    default: return "bg-black/40"
   }
 }
 
@@ -48,7 +52,9 @@ function RunnerUI({ workout }: { workout: Workout }) {
 
   if (isFinished) {
     return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center gap-6 text-white" style={{ backgroundColor: "#FF7F11" }}>
+      <div className="fixed inset-0 text-white">
+        <GradientBackground />
+        <div className="relative h-full flex flex-col items-center justify-center gap-6">
         <h1 className="text-4xl font-bold">Workout Done!</h1>
         <p className="text-6xl font-mono font-bold">
           {String(elapsedMin).padStart(2, "0")}:{String(elapsedSecRem).padStart(2, "0")}
@@ -56,17 +62,20 @@ function RunnerUI({ workout }: { workout: Workout }) {
         <p className="text-lg opacity-80">Total time</p>
         <button
           onClick={handleFinish}
-          className="mt-4 bg-white text-orange-500 font-bold px-8 py-4 rounded-2xl text-lg active:scale-95 transition-transform"
+          className="mt-4 bg-white text-neutral-900 font-bold px-8 py-4 rounded-2xl text-lg active:scale-95 transition-transform"
         >
           Finish &amp; Save
         </button>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className={`fixed inset-0 flex flex-col ${phaseBackground(state.phase)} transition-colors duration-300`}
-      style={state.phase === "finished" ? { backgroundColor: "#FF7F11" } : undefined}>
+    <div className="fixed inset-0 text-white">
+      <GradientBackground />
+      <div className={`absolute inset-0 ${phaseTint(state.phase)} transition-colors duration-300`} />
+      <div className="relative h-full flex flex-col">
 
       {/* Top info */}
       <div className="flex flex-col items-center pt-12 px-6 gap-1 landscape-hide">
@@ -128,6 +137,7 @@ function RunnerUI({ workout }: { workout: Workout }) {
         >
           <SkipForward size={28} />
         </button>
+      </div>
       </div>
     </div>
   )

@@ -5,15 +5,17 @@ import { getAllWorkouts, deleteWorkout } from "../lib/db"
 import type { Workout } from "../shared/schema"
 import { StatsBar } from "../components/StatsBar"
 import { WorkoutCard } from "../components/WorkoutCard"
+import { useDataVersion } from "../lib/sync"
 
 export function HomePage() {
   const [workouts, setWorkouts] = useState<Workout[]>([])
+  const dataVersion = useDataVersion()
 
   async function load() {
     setWorkouts(await getAllWorkouts())
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [dataVersion])
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this workout?")) return
@@ -25,9 +27,9 @@ export function HomePage() {
   const custom = workouts.filter((w) => !w.isPreset)
 
   return (
-    <div className="pb-20">
+    <div className="pb-28">
       <header className="px-4 pt-6 pb-2">
-        <h1 className="text-2xl font-bold">Personal PT</h1>
+        <h1 className="text-5xl font-bold text-center tracking-tight">pump off</h1>
       </header>
 
       <StatsBar />
@@ -55,14 +57,7 @@ export function HomePage() {
             </button>
           </Link>
         </div>
-        {custom.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">
-            No custom workouts yet.{" "}
-            <Link href="/create" className="text-primary underline">
-              Create one!
-            </Link>
-          </p>
-        ) : (
+        {custom.length > 0 && (
           <div className="flex flex-col gap-3">
             {custom.map((w) => (
               <WorkoutCard key={w.id} workout={w} onDelete={handleDelete} />

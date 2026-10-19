@@ -7,6 +7,28 @@ const DB_VERSION = 1
 
 type AppDB = IDBPDatabase<unknown>
 
+// ---------------------------------------------------------------------------
+// Change events — the sync layer listens to these so db.ts doesn't depend on it
+// ---------------------------------------------------------------------------
+
+export type DbChange =
+  | { type: "workout-saved"; workout: Workout }
+  | { type: "workout-deleted"; id: string }
+  | { type: "run-saved"; run: WorkoutRun }
+  | { type: "runs-cleared"; ids: string[] }
+  | { type: "merged" }
+
+const listeners = new Set<(change: DbChange) => void>()
+
+export function onDbChange(listener: (change: DbChange) => void): () => void {
+  listeners.add(listener)
+  return () => listeners.delete(listener)
+}
+
+export function emitDbChange(change: DbChange) {
+  listeners.forEach((l) => l(change))
+}
+
 let dbPromise: Promise<AppDB> | null = null
 
 export function getDB(): Promise<AppDB> {
@@ -45,7 +67,7 @@ export function getDB(): Promise<AppDB> {
 // Serialization helpers (Date → ISO string for IndexedDB)
 // ---------------------------------------------------------------------------
 
-function serializeWorkout(w: Workout): Record<string, unknown> {
+export function serializeWorkout(w: Workout): Record<string, unknown> {
   return {
     ...w,
     createdAt: w.createdAt.toISOString(),
@@ -53,7 +75,7 @@ function serializeWorkout(w: Workout): Record<string, unknown> {
   }
 }
 
-function deserializeWorkout(raw: Record<string, unknown>): Workout {
+export function deserializeWorkout(raw: Record<string, unknown>): Workout {
   return workoutSchema.parse({
     ...raw,
     createdAt: new Date(raw.createdAt as string),
@@ -61,7 +83,7 @@ function deserializeWorkout(raw: Record<string, unknown>): Workout {
   })
 }
 
-function serializeRun(r: WorkoutRun): Record<string, unknown> {
+export function serializeRun(r: WorkoutRun): Record<string, unknown> {
   return {
     ...r,
     startedAt: r.startedAt.toISOString(),
@@ -69,7 +91,7 @@ function serializeRun(r: WorkoutRun): Record<string, unknown> {
   }
 }
 
-function deserializeRun(raw: Record<string, unknown>): WorkoutRun {
+export function deserializeRun(raw: Record<string, unknown>): WorkoutRun {
   return workoutRunSchema.parse({
     ...raw,
     startedAt: new Date(raw.startedAt as string),
@@ -93,15 +115,18 @@ export async function getWorkout(id: string): Promise<Workout | undefined> {
   return raw ? deserializeWorkout(raw) : undefined
 }
 
-export async function saveWorkout(workout: Workout): Promise<void> {
+/** `silent` is for the sync layer applying remote data, so it isn't pushed straight back. */
+export async function saveWorkout(workout: Workout, opts?: { silent?: boolean }): Promise<void> {
   const validated = workoutSchema.parse(workout)
   const db = await getDB()
   await db.put("workouts", serializeWorkout(validated))
+  if (!opts?.silent) emitDbChange({ type: "workout-saved", workout: validated })
 }
 
-export async function deleteWorkout(id: string): Promise<void> {
+export async function deleteWorkout(id: string, opts?: { silent?: boolean }): Promise<void> {
   const db = await getDB()
   await db.delete("workouts", id)
+  if (!opts?.silent) emitDbChange({ type: "workout-deleted", id })
 }
 
 // ---------------------------------------------------------------------------
@@ -116,15 +141,24 @@ export async function getAllRuns(): Promise<WorkoutRun[]> {
   )
 }
 
-export async function saveRun(run: WorkoutRun): Promise<void> {
+export async function saveRun(run: WorkoutRun, opts?: { silent?: boolean }): Promise<void> {
   const validated = workoutRunSchema.parse(run)
   const db = await getDB()
   await db.put("runs", serializeRun(validated))
+  if (!opts?.silent) emitDbChange({ type: "run-saved", run: validated })
+}
+
+export async function deleteRun(id: string, opts?: { silent?: boolean }): Promise<void> {
+  const db = await getDB()
+  await db.delete("runs", id)
+  if (!opts?.silent) emitDbChange({ type: "runs-cleared", ids: [id] })
 }
 
 export async function clearAllRuns(): Promise<void> {
   const db = await getDB()
+  const ids = (await db.getAllKeys("runs")) as string[]
   await db.clear("runs")
+  emitDbChange({ type: "runs-cleared", ids })
 }
 
 // ---------------------------------------------------------------------------

@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react"
 import { getAllRuns } from "../lib/db"
+import { useDataVersion } from "../lib/sync"
 import type { WorkoutRun } from "../shared/schema"
 import { CheckCircle, XCircle } from "lucide-react"
 
 export function HistoryPage() {
   const [runs, setRuns] = useState<WorkoutRun[]>([])
+  const dataVersion = useDataVersion()
 
-  useEffect(() => { getAllRuns().then(setRuns) }, [])
+  useEffect(() => { getAllRuns().then(setRuns) }, [dataVersion])
 
   return (
-    <div className="pb-20">
+    <div className="pb-28">
       <header className="px-4 pt-6 pb-4">
         <h1 className="text-2xl font-bold">History</h1>
       </header>

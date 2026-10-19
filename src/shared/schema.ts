@@ -28,17 +28,15 @@ export function newExercise(overrides?: Partial<Exercise>): Exercise {
 // Workout
 // ---------------------------------------------------------------------------
 
-export const soundOptionSchema = z.enum(["classic", "electronic", "vibrant"])
-export type SoundOption = z.infer<typeof soundOptionSchema>
-
 export const workoutSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1, "Workout name is required"),
   isPreset: z.boolean(),
   exercises: z.array(exerciseSchema).min(1, "At least one exercise is required"),
   rounds: z.number().int().positive().default(1),
+  /** Extra pause between rounds, on top of the last exercise's rest. */
+  roundRestSec: z.number().int().min(0).default(0),
   colorAccent: z.string().optional(),
-  soundOption: soundOptionSchema,
   createdAt: z.date(),
   updatedAt: z.date().optional(),
 })
@@ -52,7 +50,7 @@ export function newWorkout(overrides?: Partial<Workout>): Workout {
     isPreset: false,
     exercises: [],
     rounds: 1,
-    soundOption: "classic",
+    roundRestSec: 0,
     createdAt: new Date(),
     ...overrides,
   }
@@ -97,7 +95,7 @@ export function totalWorkoutSeconds(workout: Workout): number {
     (sum, ex) => sum + ex.durationSec + ex.restSec,
     0
   )
-  return perRound * workout.rounds
+  return perRound * workout.rounds + workout.roundRestSec * (workout.rounds - 1)
 }
 
 /** Total steps (work phases) for a workout */

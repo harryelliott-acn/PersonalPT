@@ -6,10 +6,15 @@ export function BottomNav() {
   if (isRun) return null
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border flex items-center justify-around h-16 safe-area-pb">
-      <NavItem href="/" icon={<Home size={22} />} label="Home" />
-      <NavItem href="/history" icon={<History size={22} />} label="History" />
-      <NavItem href="/settings" icon={<Settings size={22} />} label="Settings" />
+    <nav
+      className="fixed left-0 right-0 z-50 max-w-lg mx-auto px-4 pointer-events-none"
+      style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
+    >
+      <div className="pointer-events-auto bg-card border border-border rounded-full shadow-lg p-1.5 flex items-center gap-1">
+        <NavItem href="/" icon={<Home size={22} />} label="Home" />
+        <NavItem href="/history" icon={<History size={22} />} label="History" />
+        <NavItem href="/settings" icon={<Settings size={22} />} label="Settings" />
+      </div>
     </nav>
   )
 }
@@ -19,12 +24,12 @@ function NavItem({ href, icon, label }: { href: string; icon: React.ReactNode; l
   return (
     <Link
       href={href}
-      className={`flex flex-col items-center gap-1 px-4 py-1 transition-colors ${
-        active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+      aria-label={label}
+      className={`flex-1 flex items-center justify-center py-3.5 rounded-full transition-colors ${
+        active ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
       }`}
     >
       {icon}
-      <span className="text-[10px] font-medium">{label}</span>
     </Link>
   )
 }
