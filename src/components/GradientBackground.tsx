@@ -1,9 +1,12 @@
+import { GradientPlaceholder } from "./GradientPlaceholder"
 import { ShaderGradientCanvas, ShaderGradient } from "@shadergradient/react"
 
 export function GradientBackground() {
   return (
     <div className="absolute inset-0 pointer-events-none" aria-hidden>
+      <GradientPlaceholder />
       <ShaderGradientCanvas
+        className="gradient-fade-in"
         style={{ position: "absolute", inset: 0 }}
         pixelDensity={1}
         fov={45}
