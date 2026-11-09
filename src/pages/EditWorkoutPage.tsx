@@ -13,6 +13,7 @@ export function EditWorkoutPage() {
   const [workout, setWorkout] = useState<Workout>(() => newWorkout())
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(isEdit)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
     if (params.id) {
@@ -27,6 +28,9 @@ export function EditWorkoutPage() {
     const errs: Record<string, string> = {}
     if (!workout.name.trim()) errs.name = "Workout name is required"
     if (workout.exercises.length === 0) errs.exercises = "Add at least one exercise"
+    workout.exercises.forEach((ex, i) => {
+      if (!ex.name.trim()) errs[`ex:${ex.id}`] = `Give exercise ${i + 1} a name`
+    })
     setErrors(errs)
     return Object.keys(errs).length === 0
   }
@@ -45,14 +49,22 @@ export function EditWorkoutPage() {
 
   async function handleSave() {
     if (!validate()) return
-    await save()
-    navigate("/")
+    try {
+      await save()
+      navigate("/")
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : "Couldn't save this workout")
+    }
   }
 
   async function handleSaveAndStart() {
     if (!validate()) return
-    const id = await save()
-    navigate(`/run/${id}`)
+    try {
+      const id = await save()
+      navigate(`/run/${id}`)
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : "Couldn't save this workout")
+    }
   }
 
   function updateField<K extends keyof Workout>(key: K, value: Workout[K]) {
@@ -109,7 +121,7 @@ export function EditWorkoutPage() {
             type="number"
             min={1}
             value={workout.rounds}
-            onChange={(e) => updateField("rounds", Math.max(1, Number(e.target.value)))}
+            onChange={(e) => updateField("rounds", Math.max(1, Math.floor(Number(e.target.value)) || 1))}
             className="w-24 bg-card border border-border rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/50"
           />
         </div>
@@ -147,7 +159,9 @@ export function EditWorkoutPage() {
                     value={ex.name}
                     onChange={(e) => updateExercise(ex.id, "name", e.target.value)}
                     placeholder="Exercise name"
-                    className="flex-1 bg-transparent border-b border-border pb-1 text-sm outline-none"
+                    className={`flex-1 bg-transparent border-b pb-1 text-sm outline-none ${
+                      errors[`ex:${ex.id}`] ? "border-destructive" : "border-border"
+                    }`}
                   />
                   <button
                     onClick={() => removeExercise(ex.id)}
@@ -157,6 +171,9 @@ export function EditWorkoutPage() {
                     <Trash2 size={16} />
                   </button>
                 </div>
+                {errors[`ex:${ex.id}`] && (
+                  <p className="text-destructive text-xs pl-7 -mt-1">{errors[`ex:${ex.id}`]}</p>
+                )}
                 <div className="flex gap-4 pl-7">
                   <div className="flex-1">
                     <label className="text-xs text-muted-foreground">Work (sec)</label>
@@ -164,7 +181,7 @@ export function EditWorkoutPage() {
                       type="number"
                       min={1}
                       value={ex.durationSec}
-                      onChange={(e) => updateExercise(ex.id, "durationSec", Math.max(1, Number(e.target.value)))}
+                      onChange={(e) => updateExercise(ex.id, "durationSec", Math.max(1, Math.floor(Number(e.target.value)) || 1))}
                       className="w-full bg-transparent border-b border-border pb-1 text-sm outline-none mt-0.5"
                     />
                   </div>
@@ -174,7 +191,7 @@ export function EditWorkoutPage() {
                       type="number"
                       min={0}
                       value={ex.restSec}
-                      onChange={(e) => updateExercise(ex.id, "restSec", Math.max(0, Number(e.target.value)))}
+                      onChange={(e) => updateExercise(ex.id, "restSec", Math.max(0, Math.floor(Number(e.target.value)) || 0))}
                       className="w-full bg-transparent border-b border-border pb-1 text-sm outline-none mt-0.5"
                     />
                   </div>
@@ -194,7 +211,12 @@ export function EditWorkoutPage() {
       </div>
 
       {/* Actions */}
-      <div className="px-4 mt-6 flex gap-3">
+      {(Object.keys(errors).length > 0 || saveError) && (
+        <p className="px-4 mt-6 text-destructive text-sm" role="alert">
+          {saveError ?? Object.values(errors)[0]}
+        </p>
+      )}
+      <div className="px-4 mt-4 flex gap-3">
         <button
           onClick={handleSave}
           className="flex-1 bg-muted text-foreground rounded-xl py-3 text-sm font-semibold"
